@@ -10,7 +10,7 @@ function findBookById(books, id) {
 
 function partitionBooksByBorrowedStatus(books) {
   return books.reduce((acc, book) => {
-    if(book.borrows.some(borrow => borrow.returned === false)){
+    if(book.borrows[0].returned === false){
       acc[0].push(book);
     }else{
       acc[1].push(book);
