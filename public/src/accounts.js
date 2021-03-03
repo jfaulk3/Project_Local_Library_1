@@ -10,13 +10,13 @@ function sortAccountsByLastName(accounts) {
 }
 
 function getTotalNumberOfBorrows(account, books) {
-  return books.filter((book) => {
-    return book.borrows.some((borrower) => borrower.id === account.id);
+  return books.filter(({borrows}) => {
+    return borrows.some((borrower) => borrower.id === account.id);
   }).length;
 }
 
 function getBooksPossessedByAccount(account, books, authors) {
-  let list = books.filter(({borrows}) => {
+  const list = books.filter(({borrows}) => {
     return borrows.some((borrower) => {
       return borrower.id === account.id && borrower.returned === false;
     });
