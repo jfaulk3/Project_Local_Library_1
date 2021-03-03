@@ -9,47 +9,65 @@ function getTotalAccountsCount(accounts) {
 }
 
 function getBooksBorrowedCount(books) {
-  return books.filter(book => {
+  return books.filter((book) => {
     return book.borrows[0].returned === false;
   }).length;
 }
 
 function getMostCommonGenres(books) {
-  let genres = [];
-  books.forEach(book => {
-    if (genres.some(genre => genre.name === book.genre)) {
-      genres.find(genre => genre.name === book.genre).count += 1;
+  const list = [];
+  books.forEach((book) => {
+    if (list.some(({name}) => name === book.genre)) {
+      list.find(({name}) => name === book.genre).count += 1;
     } else {
-      genres.push({
+      list.push({
+        //creates a new object with name pointing to the genre and count
+        //being the number of times it appears.
         name: book.genre,
-        count: 1
+        count: 1,
       });
     }
   });
-  sorted = genres.sort((a, b) => a.count > b.count ? -1 : 1).slice(0,5);
-  return sorted;
-} 
+  return _topFiveByCount(list);
+}
 
 function getMostPopularBooks(books) {
-  return books.map(book => {
+  const list = books.map(({title, borrows}) => {
     return {
-      name: book.title,
-      count: book.borrows.length
-    }
-  }).sort((a, b) => a.count > b.count ? -1 : 1).slice(0,5);
+      name: title,
+      count: borrows.length,
+    };
+  });
+  return _topFiveByCount(list);
 }
 
 function getMostPopularAuthors(books, authors) {
-  return authors.map(author => {
+  const list = authors.map(({name, ...author}) => {
+    //Generate an array of objects where the properties will be the 'name'
+    //of an author and the 'count'
     return {
-      name: `${author.name.first} ${author.name.last}`,
-      count: books.filter(book => {
-        return book.authorId === author.id;
-      }).reduce((acc, book) => {
-        return acc += book.borrows.length;
-      }, 0)
-    }
-  }).sort((a, b) => a.count > b.count ? -1 : 1).slice(0,5);
+      name: `${name.first} ${name.last}`,
+      count: books
+        .filter((book) => {
+          //Find books whose authorId matches the author id.
+          return book.authorId === author.id;
+        })
+        .reduce((acc, {borrows}) => {
+          //Number of times books were borrowed.
+          return (acc += borrows.length);
+        }, 0),
+    };
+  });
+  return _topFiveByCount(list);
+}
+
+function _topFiveByCount(arr) {
+  //Takes in an unsorted array. The array is expected to be
+  //an array of objects who's properties are name and count.
+  //The function will sort the array of objects by the object's
+  //count value. It will then return the top five.
+
+  return arr.sort((a, b) => (a.count > b.count ? -1 : 1)).slice(0, 5);
 }
 
 module.exports = {
